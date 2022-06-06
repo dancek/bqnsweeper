@@ -60,7 +60,7 @@ Game ← {count 𝕊 size:
   seen ← size⥊0
   Guess ⇐ {𝕊 x‿y:
     g ← 1⌾(y‿x⊸⊑)size⥊0
-    seen ∨↩ Spread∘(0=adj)⊸Flood⍟(0=+´⥊g×adj) g
+    seen ∨↩(0=adj)Spread∘Flood⍟(0=+´⥊g×adj) g
   }
   Render ⇐ {𝕊: ⊑⟜".x 12345678"¨seen×seen+(¬mines)×1+adj}
   Result ⇐ {𝕊: (seen≡¬mines) - ∨´⥊seen∧mines}
