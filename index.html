@@ -50,7 +50,7 @@ The BQNsweeper code is CC0 licensed. It runs on bqn.js by Marshall Lochbaum, ISC
   const src =
 `Grid ← {𝕩⥊(↕×´𝕩)∊𝕨•rand.Deal ×´𝕩}
 Pad ← {0∾˘⍉⌽𝕩}⍟4
-Adjacent ← ¬×·+´∘⥊⎉2 3‿3↕Pad
+Adjacent ← +´∘⥊⎉2 3‿3↕Pad
 Spread ← {⍉⌽𝕩∨»𝕩}⍟4
 Flood ← ∧⟜Spread⍟{+´≢𝕩}
 
@@ -60,9 +60,9 @@ Game ← {count 𝕊 size:
   seen ← size⥊0
   Guess ⇐ {𝕊 x‿y:
     g ← 1⌾(y‿x⊸⊑)size⥊0
-    seen ↩ seen ∨ g ∨ Spread (0=adj+mines) Flood g
+    seen ∨↩ Spread∘(0=adj)⊸Flood⍟(0=+´⥊g×adj) g
   }
-  Render ⇐ {𝕊: ⊑⟜".x 12345678"¨seen×seen+1+adj-mines}
+  Render ⇐ {𝕊: ⊑⟜".x 12345678"¨seen×seen+(¬mines)×1+adj}
   Result ⇐ {𝕊: (seen≡¬mines) - ∨´⥊seen∧mines}
 }`
 
