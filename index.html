@@ -25,7 +25,13 @@ textarea, button {
 </head>
 
 <body>
-<div id="grid"><div>
+<div id="try_again">
+  <h2 id="ending_text">BQNsweeper</h2>
+  <button onClick="restartGame()">Play again</button>
+  <hr/>
+</div>
+<div id="grid"></div>
+<hr/>
 <pre id="src"></pre>
 
 <script src="bqn.js"></script>
@@ -49,41 +55,54 @@ textarea, button {
     Result ⇐ {𝕊: (seen≡¬mines) - ∨´⥊seen∧mines}
   }`
 
+  document.getElementById("src").innerText = src
+
   const v = 8
   const h = 8
 
-  let Game = run.apply(null, compile(src))
-  let obj = Game(list([h,v]), 10)
-  let ns = nsget(obj);
-  let render = ns("render")
-  let result = ns("result")
-  let guess = ns("guess")
+  function restartGame() {
+    let Game = run.apply(null, compile(src))
+    let obj = Game(list([h,v]), 10)
+    let ns = nsget(obj);
+    let render = ns("render")
+    let result = ns("result")
+    let guess = ns("guess")
 
-  document.getElementById("src").innerText = src
+    const grid = document.getElementById("grid");
+    while(grid.firstChild) grid.removeChild(grid.firstChild)
+    document.getElementById("ending_text").innerText = "BQNsweeper";
 
-  for (let i=0; i<v; i++) {
-    for (let j=0; j<h; j++) {
-      let btn = document.createElement("button")
-      btn.id = "btn-" + (i * h + j)
-        btn.innerText = "."
-        btn.addEventListener("click", () => {
-          guess(list([j,i]))
-          update()
-        })
-      grid.appendChild(btn)
+    for (let i=0; i<v; i++) {
+      for (let j=0; j<h; j++) {
+        let btn = document.createElement("button")
+        btn.id = "btn-" + (i * h + j)
+          btn.innerText = "."
+          btn.addEventListener("click", () => {
+            guess(list([j,i]))
+            update()
+          })
+        grid.appendChild(btn)
+      }
+      grid.appendChild(document.createElement("br"))
     }
-    grid.appendChild(document.createElement("br"))
+
+    function update() {
+      const g = render()
+      const res = result();
+      const gameOver = res !== 0;
+      for (i=0; i<v*h; i++) {
+        const btn = document.getElementById("btn-" + i);
+        btn.innerText = g[i]
+        btn.disabled = gameOver;
+      }
+      const text = res === 1 ? "You win" : "You lose";
+      if(gameOver) {
+        document.getElementById("ending_text").innerText = text;
+      }
+    }
   }
 
-  function update() {
-    let g = render()
-    const gameOver = result() == -1;
-    for (i=0; i<v*h; i++) {
-      const btn = document.getElementById("btn-" + i);
-      btn.innerText = g[i]
-      btn.disabled = gameOver;
-    }
-  }
+  window.onLoad=restartGame()
   
 </script>
 
