@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>BQNsweeper</title>
+<style>
+@font-face{
+  font-family: BQN386;
+  src: url(/BQN386.subset.woff2) format('woff2');
+}
+pre,code,textarea {
+  font-family: BQN386, monospace;
+}
+textarea, button {
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+</style>
+</head>
+
+<body>
+<div id="grid"><div>
+<pre id="src"></pre>
+
+<script src="bqn.js"></script>
+<script>
+  const src = `
+  Grid ← {𝕩⥊(↕×´𝕩)∊𝕨•rand.Deal ×´𝕩}
+  Pad ← {0∾˘⍉⌽𝕩}⍟4
+  Adjacent ← ¬×·+´∘⥊⎉2 3‿3↕Pad
+  Spread ← {⍉⌽𝕩∨»𝕩}⍟4
+  Flood ← ∧⟜Spread⍟{+´≢𝕩}
+
+  Game ← {count 𝕊 size:
+    mines ← count Grid size
+    adj ← Adjacent mines
+    seen ← size⥊0
+    Guess ⇐ {𝕊 x‿y:
+      guessArray ← (<y‿x)≡¨↕size
+      seen ↩ seen ∨ guessArray ∨ Spread (0=adj+mines) Flood guessArray
+    }
+    Render ⇐ {𝕊: ⊑⟜".x 12345678"¨seen×seen+1+adj-mines}
+    Result ⇐ {𝕊: (seen≡¬mines) - ∨´⥊seen∧mines}
+  }`
+
+  const v = 8
+  const h = 8
+
+  let Game = run.apply(null, compile(src))
+  let obj = Game(list([h,v]), 10)
+  let getfn = name => obj[obj.ns[obj.ns.names.indexOf(name)]]
+  let render = getfn("render")
+  let result = getfn("result")
+  let guess = getfn("guess")
+
+  document.getElementById("src").innerText = src
+
+  for (i=0; i<v; i++) {
+    for (j=0; j<h; j++) {
+      let btn = document.createElement("button")
+      btn.id = "btn-" + (i * h + j)
+        btn.innerText = "."
+        btn.addEventListener("click", () => {guess(list([i,j])); update()})
+      grid.appendChild(btn)
+    }
+    grid.appendChild(document.createElement("br"))
+  }
+
+  function update() {
+    let g = render()
+    console.log(g)
+    for (i=0; i<v*h; i++) {
+      document.getElementById("btn-" + i).innerText = g[i]
+    }
+  }
+  
+</script>
+
+</body>
+</html>
