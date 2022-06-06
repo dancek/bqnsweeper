@@ -48,10 +48,10 @@ textarea, button {
 
   let Game = run.apply(null, compile(src))
   let obj = Game(list([h,v]), 10)
-  let getfn = name => obj[obj.ns[obj.ns.names.indexOf(name)]]
-  let render = getfn("render")
-  let result = getfn("result")
-  let guess = getfn("guess")
+  let ns = nsget(obj);
+  let render = ns("render")
+  let result = ns("result")
+  let guess = ns("guess")
 
   document.getElementById("src").innerText = src
 
@@ -71,7 +71,6 @@ textarea, button {
 
   function update() {
     let g = render()
-    console.log(g)
     for (i=0; i<v*h; i++) {
       document.getElementById("btn-" + i).innerText = g[i]
     }
