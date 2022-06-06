@@ -55,12 +55,15 @@ textarea, button {
 
   document.getElementById("src").innerText = src
 
-  for (i=0; i<v; i++) {
-    for (j=0; j<h; j++) {
+  for (let i=0; i<v; i++) {
+    for (let j=0; j<h; j++) {
       let btn = document.createElement("button")
       btn.id = "btn-" + (i * h + j)
         btn.innerText = "."
-        btn.addEventListener("click", () => {guess(list([i,j])); update()})
+        btn.addEventListener("click", () => {
+          guess(list([j,i]))
+          update()
+        })
       grid.appendChild(btn)
     }
     grid.appendChild(document.createElement("br"))
