@@ -48,8 +48,8 @@ textarea, button {
     adj ← Adjacent mines
     seen ← size⥊0
     Guess ⇐ {𝕊 x‿y:
-      guessArray ← (<y‿x)≡¨↕size
-      seen ↩ seen ∨ guessArray ∨ Spread (0=adj+mines) Flood guessArray
+      g ← 1⌾(y‿x⊸⊑)size⥊0
+      seen ↩ seen ∨ g ∨ Spread (0=adj+mines) Flood g
     }
     Render ⇐ {𝕊: ⊑⟜".x 12345678"¨seen×seen+1+adj-mines}
     Result ⇐ {𝕊: (seen≡¬mines) - ∨´⥊seen∧mines}
