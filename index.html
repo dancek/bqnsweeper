@@ -21,18 +21,25 @@ textarea, button {
   padding: 0;
   vertical-align: bottom;
 }
+input {
+  width: 3em;
+}
 </style>
 </head>
 
 <body>
 <div id="try_again">
-  <h2 id="ending_text">BQNsweeper</h2>
-  <button onClick="restartGame()">Play again</button>
+  <h1 id="ending_text">BQNsweeper</h1>
+  <button onClick="restartGame()">Generate</button>
+  <input id="h" type="number" value="8">×<input id="v" type="number" value="8">,
+  <input id="m" type="number" value="10"> mines
   <hr/>
 </div>
 <div id="grid"></div>
 <hr/>
+<h2>Source code</h2>
 <pre id="src"></pre>
+(see page source for the javascript implementing this UI on top of the BQN logic)
 
 <script src="bqn.js"></script>
 <script>
@@ -57,12 +64,13 @@ textarea, button {
 
   document.getElementById("src").innerText = src
 
-  const v = 8
-  const h = 8
-
   function restartGame() {
+    const h = parseInt(document.getElementById("h").value)
+    const v = parseInt(document.getElementById("v").value)
+    const m = parseInt(document.getElementById("m").value)
+
     let Game = run.apply(null, compile(src))
-    let obj = Game(list([h,v]), 10)
+    let obj = Game(list([v,h]), m)
     let ns = nsget(obj);
     let render = ns("render")
     let result = ns("result")
