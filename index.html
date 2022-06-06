@@ -77,8 +77,11 @@ textarea, button {
 
   function update() {
     let g = render()
+    const gameOver = result() == -1;
     for (i=0; i<v*h; i++) {
-      document.getElementById("btn-" + i).innerText = g[i]
+      const btn = document.getElementById("btn-" + i);
+      btn.innerText = g[i]
+      btn.disabled = gameOver;
     }
   }
   
