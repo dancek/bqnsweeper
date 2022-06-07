@@ -15,11 +15,21 @@ textarea, button {
   font-size: 1.2rem;
   line-height: 1.4;
 }
+button[data-value=" "] { background-color: #ccc; border: 0; }
+button[data-value="1"] { color: olive; }
+button[data-value="2"] { color: teal; }
+button[data-value="3"] { color: blue; }
+button[data-value="4"] { color: navy; }
+button[data-value="5"] { color: purple; }
+button[data-value="6"] { color: fuchsia; }
+button[data-value="7"] { color: maroon; }
+button[data-value="8"] { color: red; }
 #grid > button {
   width: 30px;
   height: 30px;
   padding: 0;
   vertical-align: bottom;
+  font-weight: bold;
 }
 input {
   width: 3em;
@@ -125,6 +135,7 @@ Game ← {count 𝕊 size:
         const idx = i*h+j
         btn.id = "btn-" + idx
         btn.innerText = "."
+        btn.dataset.value = btn.innerText
         btn.addEventListener("mouseup", e => {
           const p = list([j,i])
           if (!start) start = Date.now()
@@ -168,6 +179,7 @@ Game ← {count 𝕊 size:
       for (let i=0; i<v*h; i++) {
         const btn = document.getElementById("btn-" + i)
         btn.innerText = char(flags[i], g[i], gameOver)
+        btn.dataset.value = g[i]
         btn.disabled = gameOver
       }
       const text = res === 1 ? "You win" : "You lose"
