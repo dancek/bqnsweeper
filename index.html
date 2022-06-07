@@ -71,6 +71,7 @@ Game ← {count 𝕊 size:
   }
   Render ⇐ {𝕊: ⊑⟜".x 12345678"¨seen×seen+(¬mines)×1+adj}
   Result ⇐ {𝕊: (seen≡¬mines) - ∨´⥊seen∧mines}
+  FlagOk ⇐ {0=⊑⟜seen⌽𝕩}
 }`
 
   document.getElementById("src").innerText = src
@@ -107,6 +108,7 @@ Game ← {count 𝕊 size:
     const render = ns("render")
     const result = ns("result")
     const guess = ns("guess")
+    const flagok = ns("flagok")
 
     const grid = document.getElementById("grid")
     while(grid.firstChild) grid.removeChild(grid.firstChild)
@@ -122,12 +124,15 @@ Game ← {count 𝕊 size:
         btn.id = "btn-" + idx
         btn.innerText = "."
         btn.addEventListener("mouseup", e => {
+          const p = list([j,i])
           if (!start) start = Date.now()
           if (e.button == 2) {
-            flags[idx] = !flags[idx]
-            update()
+            if(flagok(p)) {
+              flags[idx] = !flags[idx]
+              update()
+            }
           } else if (!flags[idx]) {
-            guess(list([j,i]))
+            guess(p)
             update()
           }
         })
