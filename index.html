@@ -110,18 +110,34 @@ Game ← {count 𝕊 size:
     while(grid.firstChild) grid.removeChild(grid.firstChild)
     document.getElementById("ending_text").innerText = "BQNsweeper"
 
+    let flags = new Array(h*v)
+    flags.fill(false);
+
     for (let i=0; i<v; i++) {
       for (let j=0; j<h; j++) {
         const btn = document.createElement("button")
-        btn.id = "btn-" + (i * h + j)
+        const idx = i*h+j
+        btn.id = "btn-" + idx
         btn.innerText = "."
-        btn.addEventListener("click", () => {
-          guess(list([j,i]))
-          update()
+        btn.addEventListener("mouseup", e => {
+          if (e.button == 2) {
+            flags[idx] = !flags[idx]
+            update()
+          } else if (!flags[idx]) {
+            guess(list([j,i]))
+            update()
+          }
         })
+        btn.addEventListener("contextmenu", e => e.preventDefault())
         grid.appendChild(btn)
       }
       grid.appendChild(document.createElement("br"))
+    }
+
+    function char(flag, value) {
+      if (flag) return "🚩"
+      if (value == "x") return "💣"
+      return value
     }
 
     function update() {
@@ -130,7 +146,7 @@ Game ← {count 𝕊 size:
       const gameOver = res !== 0
       for (let i=0; i<v*h; i++) {
         const btn = document.getElementById("btn-" + i)
-        btn.innerText = g[i]
+        btn.innerText = char(flags[i], g[i])
         btn.disabled = gameOver
       }
       const text = res === 1 ? "You win" : "You lose"
