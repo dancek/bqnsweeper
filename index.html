@@ -24,6 +24,12 @@ textarea, button {
 input {
   width: 3em;
 }
+
+#timer {
+  height: 1em;
+  font-size: 1.2em;
+  margin-top: 8px;
+}
 </style>
 </head>
 
@@ -33,7 +39,7 @@ input {
   <button onClick="restartGame()">Generate</button>
   <input id="h" type="number" value="8">×<input id="v" type="number" value="8">,
   <input id="m" type="number" value="10"> mines
-  <h3><span id="min">0</span>:<span id="sec">00</span></h3>
+  <div id="timer"></div>
   <hr/>
 </div>
 <div id="grid"></div>
@@ -68,22 +74,20 @@ Game ← {count 𝕊 size:
 }`
 
   document.getElementById("src").innerText = src
-  let time;
-  let min = 0
-  let sec = 0
 
-  function setTimeToDom() {
-    document.getElementById("min").innerText = min
-    document.getElementById("sec").innerText = String(sec).padStart(2, '0')
-  }
+  let timer
+  let start
 
   function updateTime() {
-    sec += 1
-    if (sec >= 60) {
-        min += 1
+    let t = "0:00.0"
+    if (start) {
+      const ms = Date.now() - start
+      const m = Math.floor(ms / 60000)
+      const s = Math.floor(ms / 1000 % 60)
+      const d = Math.floor(ms / 100 % 10)
+      t = `${m}:${s < 10 ? "0" : ""}${s}.${d}`
     }
-    sec %= 60
-    setTimeToDom()
+    document.getElementById("timer").innerText = t
   }
 
   function restartGame() {
@@ -91,13 +95,11 @@ Game ← {count 𝕊 size:
     const v = parseInt(document.getElementById("v").value)
     const m = parseInt(document.getElementById("m").value)
 
-    if(time) {
-      min = 0;
-      sec = 0;
-      clearInterval(time);
+    if(timer) {
+      start = undefined
+      clearInterval(timer)
     }
-    time = window.setInterval(updateTime, 1000)
-    setTimeToDom();
+    timer = window.setInterval(updateTime, 100)
 
     const Game = run.apply(null, compile(src))
     const obj = Game(list([v,h]), m)
@@ -120,6 +122,7 @@ Game ← {count 𝕊 size:
         btn.id = "btn-" + idx
         btn.innerText = "."
         btn.addEventListener("mouseup", e => {
+          if (!start) start = Date.now()
           if (e.button == 2) {
             flags[idx] = !flags[idx]
             update()
@@ -152,7 +155,7 @@ Game ← {count 𝕊 size:
       const text = res === 1 ? "You win" : "You lose"
       if (gameOver) {
         document.getElementById("ending_text").innerText = text
-        clearInterval(time)
+        clearInterval(timer)
       }
     }
   }
