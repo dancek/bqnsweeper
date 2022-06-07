@@ -72,16 +72,19 @@ Spread ← {⍉⌽𝕩∨»𝕩}⍟4
 Flood ← ∧⟜Spread⍟{+´≢𝕩}
 
 Game ← {count 𝕊 size:
+  repr ← ".x 12345678ff"
   mines ← count Grid size
   adj ← Adjacent mines
   seen ← size⥊0
+  flags ← size⥊0
   Guess ⇐ {𝕊 x‿y:
     g ← 1⌾(y‿x⊸⊑)size⥊0
-    seen ∨↩(0=adj)Spread∘Flood⍟(0=+´⥊g×adj) g
+    seen ∨↩(0=adj)Spread∘Flood⍟(0=+´⥊g×adj) g×¬flags
+    flags ×↩¬seen
   }
-  Render  ⇐ {𝕊: ⊑⟜".x 12345678"¨seen×seen+(¬mines)×1+adj}
+  Render  ⇐ {𝕊: ⊑⟜repr⎊'/'¨(flags×2-˜≠repr)+seen×seen+(¬mines)×1+adj}
   Result  ⇐ {𝕊: (seen≡¬mines) - ∨´⥊seen∧mines}
-  FlagOk  ⇐ {0=⊑⟜seen⌽𝕩}
+  Flag    ⇐ {flags ¬⌾(𝕩⊸⊑)⍟(0=⊑⟜seen 𝕩)↩}⌽
   ShowAll ⇐ {𝕊: seen∨↩1}
 }`
 
@@ -119,15 +122,12 @@ Game ← {count 𝕊 size:
     const render = ns("render")
     const result = ns("result")
     const guess = ns("guess")
-    const flagok = ns("flagok")
+    const flag = ns("flag")
     const showall = ns("showall")
 
     const grid = document.getElementById("grid")
     while(grid.firstChild) grid.removeChild(grid.firstChild)
     document.getElementById("ending_text").innerText = "BQNsweeper"
-
-    let flags = new Array(h*v)
-    flags.fill(false);
 
     for (let i=0; i<v; i++) {
       for (let j=0; j<h; j++) {
@@ -140,14 +140,11 @@ Game ← {count 𝕊 size:
           const p = list([j,i])
           if (!start) start = Date.now()
           if (e.button == 2) {
-            if(flagok(p)) {
-              flags[idx] = !flags[idx]
-              update()
-            }
-          } else if (!flags[idx]) {
+            flag(p)
+          } else {
             guess(p)
-            update()
           }
+          update()
         })
         btn.addEventListener("contextmenu", e => e.preventDefault())
         grid.appendChild(btn)
@@ -155,15 +152,14 @@ Game ← {count 𝕊 size:
       grid.appendChild(document.createElement("br"))
     }
 
-    function char(flag, value, gameOver) {
+    function char(value, gameOver) {
       const isMine = value === 'x'
+      const isFlag = value === 'f'
+      const isFalseFlag = value === '/'
       if (" 12345678".indexOf(value)>=0)
         return value
-      if (gameOver && flag) {
-        if (isMine) return "🚩"
-        else return "🏴"
-      }
-      if (flag) return "🚩"
+      if (isFalseFlag) return "🏴"
+      if (isFlag) return "🚩"
       if (isMine) return "💣"
       return value
     }
@@ -178,7 +174,7 @@ Game ← {count 𝕊 size:
       const g = render()
       for (let i=0; i<v*h; i++) {
         const btn = document.getElementById("btn-" + i)
-        btn.innerText = char(flags[i], g[i], gameOver)
+        btn.innerText = char(g[i], gameOver)
         btn.dataset.value = g[i]
         btn.disabled = gameOver
       }
