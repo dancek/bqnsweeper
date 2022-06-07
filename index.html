@@ -69,9 +69,10 @@ Game ← {count 𝕊 size:
     g ← 1⌾(y‿x⊸⊑)size⥊0
     seen ∨↩(0=adj)Spread∘Flood⍟(0=+´⥊g×adj) g
   }
-  Render ⇐ {𝕊: ⊑⟜".x 12345678"¨seen×seen+(¬mines)×1+adj}
-  Result ⇐ {𝕊: (seen≡¬mines) - ∨´⥊seen∧mines}
-  FlagOk ⇐ {0=⊑⟜seen⌽𝕩}
+  Render  ⇐ {𝕊: ⊑⟜".x 12345678"¨seen×seen+(¬mines)×1+adj}
+  Result  ⇐ {𝕊: (seen≡¬mines) - ∨´⥊seen∧mines}
+  FlagOk  ⇐ {0=⊑⟜seen⌽𝕩}
+  ShowAll ⇐ {𝕊: seen∨↩1}
 }`
 
   document.getElementById("src").innerText = src
@@ -109,6 +110,7 @@ Game ← {count 𝕊 size:
     const result = ns("result")
     const guess = ns("guess")
     const flagok = ns("flagok")
+    const showall = ns("showall")
 
     const grid = document.getElementById("grid")
     while(grid.firstChild) grid.removeChild(grid.firstChild)
@@ -142,19 +144,30 @@ Game ← {count 𝕊 size:
       grid.appendChild(document.createElement("br"))
     }
 
-    function char(flag, value) {
+    function char(flag, value, gameOver) {
+      const isMine = value === 'x'
+      if (" 12345678".indexOf(value)>=0)
+        return value
+      if (gameOver && flag) {
+        if (isMine) return "🚩"
+        else return "🏴"
+      }
       if (flag) return "🚩"
-      if (value == "x") return "💣"
+      if (isMine) return "💣"
       return value
     }
 
     function update() {
-      const g = render()
       const res = result()
       const gameOver = res !== 0
+
+      if(gameOver)
+        showall()
+
+      const g = render()
       for (let i=0; i<v*h; i++) {
         const btn = document.getElementById("btn-" + i)
-        btn.innerText = char(flags[i], g[i])
+        btn.innerText = char(flags[i], g[i], gameOver)
         btn.disabled = gameOver
       }
       const text = res === 1 ? "You win" : "You lose"
