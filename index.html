@@ -33,6 +33,7 @@ input {
   <button onClick="restartGame()">Generate</button>
   <input id="h" type="number" value="8">×<input id="v" type="number" value="8">,
   <input id="m" type="number" value="10"> mines
+  <h3><span id="min">0</span>:<span id="sec">00</span></h3>
   <hr/>
 </div>
 <div id="grid"></div>
@@ -67,11 +68,36 @@ Game ← {count 𝕊 size:
 }`
 
   document.getElementById("src").innerText = src
+  let time;
+  let min = 0
+  let sec = 0
+
+  function setTimeToDom() {
+    document.getElementById("min").innerText = min
+    document.getElementById("sec").innerText = String(sec).padStart(2, '0')
+  }
+
+  function updateTime() {
+    sec += 1
+    if (sec >= 60) {
+        min += 1
+    }
+    sec %= 60
+    setTimeToDom()
+  }
 
   function restartGame() {
     const h = parseInt(document.getElementById("h").value)
     const v = parseInt(document.getElementById("v").value)
     const m = parseInt(document.getElementById("m").value)
+
+    if(time) {
+      min = 0;
+      sec = 0;
+      clearInterval(time);
+    }
+    time = window.setInterval(updateTime, 1000)
+    setTimeToDom();
 
     const Game = run.apply(null, compile(src))
     const obj = Game(list([v,h]), m)
@@ -100,8 +126,8 @@ Game ← {count 𝕊 size:
 
     function update() {
       const g = render()
-      const res = result();
-      const gameOver = res !== 0;
+      const res = result()
+      const gameOver = res !== 0
       for (let i=0; i<v*h; i++) {
         const btn = document.getElementById("btn-" + i)
         btn.innerText = g[i]
@@ -110,6 +136,7 @@ Game ← {count 𝕊 size:
       const text = res === 1 ? "You win" : "You lose"
       if (gameOver) {
         document.getElementById("ending_text").innerText = text
+        clearInterval(time)
       }
     }
   }
