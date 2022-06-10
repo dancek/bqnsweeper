@@ -70,6 +70,7 @@ Pad ← {0∾˘⍉⌽𝕩}⍟4
 Adjacent ← +´∘⥊⎉2 3‿3↕Pad
 Spread ← {⍉⌽𝕩∨»𝕩}⍟4
 Flood ← ∧⟜Spread⍟{+´≢𝕩}
+Neighbors←<⎉2 3‿3↕⊢
 
 Game ← {count 𝕊 size:
   repr ← ".x 12345678ff"
@@ -77,6 +78,7 @@ Game ← {count 𝕊 size:
   adj ← Adjacent mines
   seen ← size⥊0
   flags ← size⥊0
+  Clamp ← size⊸{h‿w 𝕊 y‿x: ⟨(w-1)(0⌈⌊)y, (h-1)(0⌈⌊)x⟩}
   Guess ⇐ {𝕊 x‿y:
     g ← 1⌾(y‿x⊸⊑)size⥊0
     seen ∨↩(0=adj)Spread∘Flood⍟(0=+´⥊g×adj) g×¬flags
@@ -85,6 +87,12 @@ Game ← {count 𝕊 size:
   Render  ⇐ {𝕊: ⊑⟜repr⎊'/'¨(flags×2-˜≠repr)+seen×seen+(¬mines)×1+adj}
   Result  ⇐ {𝕊: (seen≡¬mines) - ∨´⥊seen∧mines}
   Flag    ⇐ {flags ¬⌾(𝕩⊸⊑)⍟(0=⊑⟜seen 𝕩)↩}⌽
+  Chord   ⇐ {𝕊 x‿y:
+    p←y‿x⊑adj×seen
+    Valid←{(×p) ∧ p=+´+˝𝕩⊑Neighbors Pad flags}
+    ChordCoords←⥊·∾⌜´((↕3)+1-˜⊢)¨
+    (Guess∘Clamp∘⌽¨ChordCoords)⍟Valid y‿x
+  }
   ShowAll ⇐ {𝕊: seen∨↩1}
 }`
 
@@ -124,6 +132,7 @@ Game ← {count 𝕊 size:
     const guess = ns("guess")
     const flag = ns("flag")
     const showall = ns("showall")
+    const chord = ns("chord")
 
     const grid = document.getElementById("grid")
     while(grid.firstChild) grid.removeChild(grid.firstChild)
@@ -139,7 +148,9 @@ Game ← {count 𝕊 size:
         btn.addEventListener("mouseup", e => {
           const p = list([j,i])
           if (!start) start = Date.now()
-          if (e.button == 2) {
+          if (e.button == 1) {
+            chord(p)
+          } else if (e.button == 2) {
             flag(p)
           } else {
             guess(p)
