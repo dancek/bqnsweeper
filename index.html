@@ -78,20 +78,20 @@ Game ← {count 𝕊 size:
   adj ← Adjacent mines
   seen ← size⥊0
   flags ← size⥊0
-  Clamp ← size⊸{h‿w 𝕊 y‿x: ⟨(w-1)(0⌈⌊)y, (h-1)(0⌈⌊)x⟩}
-  Guess ⇐ {𝕊 x‿y:
-    g ← 1⌾(y‿x⊸⊑)size⥊0
+  Clamp ← size⊸{h‿w 𝕊 y‿x: ⟨(h-1)(0⌈⌊)y, (w-1)(0⌈⌊)x⟩}
+  Guess ⇐ {
+    g ← 1⌾(𝕩⊸⊑)size⥊0
     seen ∨↩(0=adj)Spread∘Flood⍟(0=+´⥊g×adj) g×¬flags
     flags ×↩¬seen
   }
   Render  ⇐ {𝕊: ⊑⟜repr⎊'/'¨(flags×2-˜≠repr)+seen×seen+(¬mines)×1+adj}
   Result  ⇐ {𝕊: (seen≡¬mines) - ∨´⥊seen∧mines}
-  Flag    ⇐ {flags ¬⌾(𝕩⊸⊑)⍟(0=⊑⟜seen 𝕩)↩}⌽
-  Chord   ⇐ {𝕊 x‿y:
-    p←y‿x⊑adj×seen
+  Flag    ⇐ {flags ¬⌾(𝕩⊸⊑)⍟(0=⊑⟜seen 𝕩)↩}
+  Chord   ⇐ {
+    p←𝕩⊑adj×seen
     Valid←{(×p) ∧ p=+´+˝𝕩⊑Neighbors Pad flags}
     ChordCoords←⥊·∾⌜´((↕3)+1-˜⊢)¨
-    (Guess∘Clamp∘⌽¨ChordCoords)⍟Valid y‿x
+    (Guess∘Clamp¨ChordCoords)⍟Valid 𝕩
   }
   ShowAll ⇐ {𝕊: seen∨↩1}
 }`
@@ -114,8 +114,8 @@ Game ← {count 𝕊 size:
   }
 
   function restartGame() {
-    const h = parseInt(document.getElementById("h").value)
-    const v = parseInt(document.getElementById("v").value)
+    const h = parseInt(document.getElementById("v").value)
+    const v = parseInt(document.getElementById("h").value)
     const m = parseInt(document.getElementById("m").value)
 
     if(timer) {
@@ -146,7 +146,7 @@ Game ← {count 𝕊 size:
         btn.innerText = "."
         btn.dataset.value = btn.innerText
         btn.addEventListener("mouseup", e => {
-          const p = list([j,i])
+          const p = list([i,j])
           if (!start) start = Date.now()
           if (e.button == 1) {
             chord(p)
