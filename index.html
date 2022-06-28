@@ -95,6 +95,7 @@ Game ← {count 𝕊 size:
   }
   ShowAll ⇐ {𝕊: seen∨↩1}
 }`
+  const bytecode = compile(src)
 
   document.getElementById("src").innerText = src
 
@@ -124,7 +125,7 @@ Game ← {count 𝕊 size:
     }
     timer = window.setInterval(updateTime, 100)
 
-    const Game = run.apply(null, compile(src))
+    const Game = run.apply(null, bytecode)
     const obj = Game(list([v,h]), m)
     const ns = nsget(obj)
     const render = ns("render")
