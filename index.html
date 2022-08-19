@@ -70,13 +70,13 @@ Pad ← {0∾˘⍉⌽𝕩}⍟4
 Adjacent ← +´∘⥊⎉2 3‿3↕Pad
 Spread ← {⍉⌽𝕩∨»𝕩}⍟4
 Flood ← ∧⟜Spread⍟{+´≢𝕩}
-Neighbors←<⎉2 3‿3↕⊢
+Neighbors ← <⎉2 3‿3↕⊢
 
 Game ← {count 𝕊 size:
-  repr ← ".x 12345678ff"
+  repr  ← ".x 12345678ff"
   mines ← count Grid size
-  adj ← Adjacent mines
-  seen ← size⥊0
+  adj   ← Adjacent mines
+  seen  ← size⥊0
   flags ← size⥊0
   Clamp ← size⊸{h‿w 𝕊 y‿x: ⟨(h-1)(0⌈⌊)y, (w-1)(0⌈⌊)x⟩}
   Guess ⇐ {
